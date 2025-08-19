@@ -1,0 +1,49 @@
+# Default values for django-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: 145023106654.dkr.ecr.us-east-1.amazonaws.com/lesson-8-9-ecr
+  pullPolicy: IfNotPresent
+  tag: "v3"
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Environment variables for ConfigMap
+config:
+  DEBUG: "True"
+  ALLOWED_HOSTS: "*"
+  SECRET_KEY: "your-secret-key-here"
+  DATABASE_URL: "postgresql://django_user:django_password@db:5432/django_db"
+  STATIC_URL: "/static/"
+  MEDIA_URL: "/media/"
+  TIME_ZONE: "UTC"
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  database: "django_db"
+  username: "django_user"
+  password: "django_password"
