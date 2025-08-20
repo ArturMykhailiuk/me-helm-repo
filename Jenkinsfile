@@ -77,7 +77,7 @@ spec:
 
     stage('Commit & Push changes to values.yaml repo') {
       steps {
-        container('kaniko') {
+        container('git') {
           sh '''
             cd goit-devops
             git config user.email "jenkins@local"
