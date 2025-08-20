@@ -56,7 +56,7 @@ spec:
 
     stage('Clone values.yaml repo') {
       steps {
-        container('kaniko') {
+        container('git') {
           sh '''
             rm -rf goit-devops
             git clone --branch $VALUES_BRANCH https://$GIT_CRED@github.com/ArturMykhailiuk/goit-devops.git
@@ -67,10 +67,11 @@ spec:
 
     stage('Update image tag in values.yaml') {
       steps {
-        sh '''
-          chmod -R 777 goit-devops
-          sed -i "s|tag:.*|tag: $IMAGE_TAG|" goit-devops/$VALUES_PATH
-        '''
+        container('kaniko') {
+          sh '''
+            sed -i "s|tag:.*|tag: $IMAGE_TAG|" goit-devops/$VALUES_PATH
+          '''
+        }
       }
     }
 
