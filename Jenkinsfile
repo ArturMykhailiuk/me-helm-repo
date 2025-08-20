@@ -68,7 +68,8 @@ spec:
     stage('Update image tag in values.yaml') {
       steps {
         sh '''
-          sed -i "s|tag:.*|tag: \"$IMAGE_TAG\"|" goit-devops/$VALUES_PATH
+          chmod -R 777 goit-devops
+          sed -i "s|tag:.*|tag: $IMAGE_TAG|" goit-devops/$VALUES_PATH
         '''
       }
     }
