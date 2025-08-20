@@ -56,7 +56,7 @@ spec:
 
     stage('Clone values.yaml repo') {
       steps {
-        container('git') {
+        container('kaniko') {
           sh '''
             rm -rf goit-devops
             git clone --branch $VALUES_BRANCH https://$GIT_CRED@github.com/ArturMykhailiuk/goit-devops.git
@@ -76,7 +76,7 @@ spec:
 
     stage('Commit & Push changes to values.yaml repo') {
       steps {
-        container('git') {
+        container('kaniko') {
           sh '''
             cd goit-devops
             git config user.email "jenkins@local"
