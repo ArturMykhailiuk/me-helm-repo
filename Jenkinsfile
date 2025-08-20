@@ -24,7 +24,11 @@ spec:
   environment {
     ECR_REGISTRY = "397114334021.dkr.ecr.us-west-2.amazonaws.com"
     IMAGE_NAME   = "app"
-    IMAGE_TAG    = "latest"
+    IMAGE_TAG    = "${BUILD_NUMBER}"
+    GIT_CRED     = credentials('GITHUB_TOKEN_ID') // Jenkins credential id for GitHub token
+    VALUES_REPO  = "https://github.com/ArturMykhailiuk/goit-devops.git"
+    VALUES_BRANCH = "lesson-8-9"
+    VALUES_PATH  = "lesson-8-9/modules/jenkins/values.yaml"
   }
 
   stages {
@@ -39,6 +43,40 @@ spec:
               --cache=true \\
               --insecure \\
               --skip-tls-verify
+          '''
+        }
+      }
+    }
+
+    stage('Clone values.yaml repo') {
+      steps {
+        container('git') {
+          sh '''
+            rm -rf goit-devops
+            git clone --branch $VALUES_BRANCH https://$GIT_CRED@github.com/ArturMykhailiuk/goit-devops.git
+          '''
+        }
+      }
+    }
+
+    stage('Update image tag in values.yaml') {
+      steps {
+        sh '''
+          sed -i "s|tag:.*|tag: \"$IMAGE_TAG\"|" goit-devops/$VALUES_PATH
+        '''
+      }
+    }
+
+    stage('Commit & Push changes to values.yaml repo') {
+      steps {
+        container('git') {
+          sh '''
+            cd goit-devops
+            git config user.email "jenkins@local"
+            git config user.name "Jenkins CI"
+            git add $VALUES_PATH
+            git commit -m "Update image tag to $IMAGE_TAG [ci skip]" || echo "No changes to commit"
+            git push https://$GIT_CRED@github.com/ArturMykhailiuk/goit-devops.git $VALUES_BRANCH
           '''
         }
       }
