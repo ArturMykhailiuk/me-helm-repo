@@ -1,39 +1,47 @@
 pipeline {
-    agent any
-    environment {
-        DJANGO_SETTINGS_MODULE = "myproject.settings"
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: jenkins-kaniko
+spec:
+  serviceAccountName: jenkins-sa
+  containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:v1.16.0-debug
+      imagePullPolicy: Always
+      command:
+        - sleep
+      args:
+        - 99d
+"""
     }
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
+  }
+
+  environment {
+    ECR_REGISTRY = "397114334021.dkr.ecr.us-west-2.amazonaws.com"
+    IMAGE_NAME   = "app"
+    IMAGE_TAG    = "latest"
+  }
+
+  stages {
+    stage('Build & Push Docker Image') {
+      steps {
+        container('kaniko') {
+          sh '''
+            /kaniko/executor \\
+              --context `pwd` \\
+              --dockerfile `pwd`/Dockerfile \\
+              --destination=$ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG \\
+              --cache=true \\
+              --insecure \\
+              --skip-tls-verify
+          '''
         }
-        stage('Install dependencies') {
-            steps {
-                sh 'pip install -r requirements.txt'
-            }
-        }
-        stage('Lint') {
-            steps {
-                sh 'pip install flake8 && flake8 myproject'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'pip install pytest && pytest'
-            }
-        }
-        stage('Build Docker image') {
-            steps {
-                sh 'docker build -t django-app:${BUILD_NUMBER} .'
-            }
-        }
-        // Додайте деплой-стадію за потреби
+      }
     }
-    post {
-        always {
-            junit '**/test-*.xml'
-        }
-    }
+  }
 }
