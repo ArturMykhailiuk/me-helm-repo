@@ -23,7 +23,7 @@ spec:
 
   environment {
     ECR_REGISTRY = "145023106654.dkr.ecr.us-east-1.amazonaws.com/lesson-8-9-ecr"
-    IMAGE_NAME   = ""
+    IMAGE_NAME   = "lesson-8-9-ecr"
     IMAGE_TAG    = "build-${BUILD_NUMBER}"
     GIT_CRED     = credentials('GITHUB_TOKEN_ID') // Jenkins credential id for GitHub token
     VALUES_REPO  = "https://github.com/ArturMykhailiuk/goit-devops.git"
