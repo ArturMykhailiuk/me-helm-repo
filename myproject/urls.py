@@ -10,7 +10,7 @@ from django.http import HttpResponse
 def home_view(request):
     return HttpResponse(
         """
-    <h1>🚀 Django з Docker працює! Чудово! Test push - 7</h1>
+    <h1>🚀 Django з Docker працює! Чудово! Test push - 8</h1>
     <p>Вітаємо! Ваш Django проєкт успішно запущений в Docker контейнері.</p>
     <hr>
     <p><strong>Конфігурація:</strong></p>
